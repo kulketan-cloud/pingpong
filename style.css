@@ -1,0 +1,23 @@
+.container{
+    display: block;
+    background-color: black;
+    border: 5px solid black;
+    margin: auto;
+    width: 50vw;
+    height: 50vh;
+}
+
+.net{
+    position: fixed;
+    background-color:green;
+    width: 2px;
+    height: inherit;
+    left: 50%;
+}
+
+.paddle{
+    background-color: white;
+    height: 25px;
+    width: 15px;
+
+}

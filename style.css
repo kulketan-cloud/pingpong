@@ -19,5 +19,14 @@
     background-color: white;
     height: 25px;
     width: 15px;
+}
 
+.ball{
+    position: absolute;
+    border-radius: 100%;
+    width: 25px;
+    height: 25px;
+    margin:auto;
+    left: 50%;
+    background-color: red;
 }

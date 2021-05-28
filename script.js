@@ -1,8 +1,9 @@
 const canvas = document.getElementById("ttgame");
-const framePerSecond = 70;
+const framePerSecond = 50;
 const ctx = canvas.getContext('2d');
 console.log(ctx);
 var audio = new Audio("preview.mp3");
+
 const ttball = {
     x : canvas.width/2,
     y : canvas.height/2,
@@ -15,6 +16,9 @@ const ttball = {
 const ttuser = {
     x : 0, 
     y : (canvas.height-100)/2, 
+    
+    vx: 0,
+    vy: 10,
 
     width : 10,
     height : 100,
@@ -26,7 +30,9 @@ const ttcomp = {
     x : canvas.width - 10, 
     y : (canvas.height - 100)/2, 
 
+    vx: 0,
     vy : 5,
+
     width : 10,
     height : 100,
     score : 0,
@@ -56,17 +62,15 @@ function drawBall(x, y, r, color){
 
 document.onkeydown = function keyControlsUser(ev){
     
-    const paddleSpeed = 30; 
-
     if(ev.key=="ArrowUp"){
     
-      if(ttuser.y < paddleSpeed) {
+      if(ttuser.y < ttuser.vy) {
         ttuser.y = 0;
       //  raf = window.requestAnimationFrame(render);
       }
-      else if(ttuser.y >=0 ) 
+      else
       {
-        ttuser.y -= paddleSpeed;
+        ttuser.y -= ttuser.vy;
      //   raf = window.requestAnimationFrame(render);
       }
 
@@ -74,14 +78,13 @@ document.onkeydown = function keyControlsUser(ev){
     if(ev.key=="ArrowDown"){
 
 
-        if(ttuser.y > canvas.height-(100 + paddleSpeed)){
+        if(ttuser.y > canvas.height-(100 + ttuser.vy)){
             ttuser.y = canvas.height - 100;
             //raf = window.requestAnimationFrame(render);
         }
-
-        else if(ttuser.y<canvas.height-100)
+        else
         {
-        ttuser.y += paddleSpeed;
+            ttuser.y += ttuser.vy;
         //raf = window.requestAnimationFrame(render);
         }
     }
@@ -117,7 +120,6 @@ function game(){
 //var  = window.requestAnimationFrame(render);
 //1 = going top
 //2 = going straight
-//3 = going bot
 
 var directionofBall = 2;
 
@@ -172,7 +174,6 @@ function moveBall(){
             }
             else{
                 directionofBall = 1;
-                console.log("touching top");
             }
         }
     }
@@ -222,9 +223,9 @@ function restartGame(){
 function pauseGame(){
     execution = false;
     console.log("Setting execution to: " + execution);
-    
 }
 function ttcompAutomation(){
+
     if(ttball.y > ttcomp.y + ttcomp.height - ttball.radius){
         ttcomp.y += ttcomp.vy;
     }
@@ -233,11 +234,33 @@ function ttcompAutomation(){
     }
 }
 function startGame(){
-    execution = true;
-    console.log("Setting execution to: " + execution);
-    if(execution){
+
     let loop = setInterval(game,1000/framePerSecond);
-    }
+
 }
+
+function fullScreen(){
+    fullScreenFlag = true;
+   // canvas.width = window.innerWidth - (window.innerWidth *(3/100));
+   // canvas.height = window.innerHeight - (window.innerHeight* (3/100));
+    let elem = document.getElementById("ttgame");
+
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen();
+    }
+    
+    render();
+}
+
+document.getElementById("ttgame").addEventListener('mousemove', e =>{
+    if(fullScreenFlag){
+        document.getElementById("buttonList").style.zIndex = "1000";
+    }
+})
 var execution = true;
+var fullScreenFlag = false;
 render();

@@ -1,10 +1,13 @@
-const canvas = document.getElementById("ttgame");
+var canvas = document.getElementById("ttgame");
 const framePerSecond = 50;
 const ctx = canvas.getContext('2d');
-console.log(ctx);
 var audio = new Audio("preview.mp3");
+var directionofBall = 2;
+var execution = false;
+var loop;
+//var fullScreenFlag = false;
 
-const ttball = {
+var ttball = {
     x : canvas.width/2,
     y : canvas.height/2,
     vx: 5,
@@ -13,12 +16,12 @@ const ttball = {
     color : "#FBC16E"
 }
 
-const ttuser = {
+var ttuser = {
     x : 0, 
     y : (canvas.height-100)/2, 
     
     vx: 0,
-    vy: 10,
+    vy: 50,
 
     width : 10,
     height : 100,
@@ -26,19 +29,19 @@ const ttuser = {
     color : "#3B59F2"
 }
 
-const ttcomp = {
+var ttcomp = {
     x : canvas.width - 10, 
     y : (canvas.height - 100)/2, 
 
     vx: 0,
-    vy : 5,
+    vy : 4,
 
     width : 10,
     height : 100,
     score : 0,
     color : "#FB747A"
 }
-const ttnet = {
+var ttnet = {
     x : (canvas.width - 2)/2,
     y : 0,
     height : 10,
@@ -61,38 +64,43 @@ function drawBall(x, y, r, color){
 }
 
 document.onkeydown = function keyControlsUser(ev){
-    
-    if(ev.key=="ArrowUp"){
-    
-      if(ttuser.y < ttuser.vy) {
-        ttuser.y = 0;
-      //  raf = window.requestAnimationFrame(render);
-      }
-      else
-      {
-        ttuser.y -= ttuser.vy;
-     //   raf = window.requestAnimationFrame(render);
-      }
-
-    }
-    if(ev.key=="ArrowDown"){
-
-
-        if(ttuser.y > canvas.height-(100 + ttuser.vy)){
-            ttuser.y = canvas.height - 100;
-            //raf = window.requestAnimationFrame(render);
+    if(execution){
+        if(ev.key=="ArrowUp" || ev.key=="W"){
+        
+        if(ttuser.y < ttuser.vy) {
+            ttuser.y = 0;
+        //  raf = window.requestAnimationFrame(render);
         }
         else
         {
-            ttuser.y += ttuser.vy;
-        //raf = window.requestAnimationFrame(render);
+            ttuser.y -= ttuser.vy;
+        //   raf = window.requestAnimationFrame(render);
         }
-    }
+
+        }
+        if(ev.key=="ArrowDown" || ev.key=="S"){
+
+
+            if(ttuser.y > canvas.height-(100 + ttuser.vy)){
+                ttuser.y = canvas.height - 100;
+                //raf = window.requestAnimationFrame(render);
+            }
+            else
+            {
+                ttuser.y += ttuser.vy;
+            //raf = window.requestAnimationFrame(render);
+            }
+        }
+    }/*
+    if(ev.key=="Escape"){
+        console.log('pressed esc key');
+        changeScreenToMinimize();
+    }*/
 }
 
 function drawNet(){
     for(let i = 0; i <= canvas.height; i+=15){
-        drawRect(ttnet.x, ttnet.y + i, ttnet.width, ttnet.height, ttnet.color);
+        drawRect((canvas.width-2)/2, ttnet.y + i, ttnet.width, ttnet.height, ttnet.color);
     }
 }
 function drawScore(text,x,y){
@@ -108,7 +116,9 @@ function render(){
     drawScore(ttuser.score,canvas.width/4,canvas.height/7);
     drawScore(ttcomp.score,3*canvas.width/4,canvas.height/7);    
     drawNet();
+    //user
     drawRect(ttuser.x, ttuser.y, ttuser.width, ttuser.height, ttuser.color);
+    //comp
     drawRect(ttcomp.x, ttcomp.y, ttcomp.width, ttcomp.height, ttcomp.color);
     drawBall(ttball.x, ttball.y, ttball.radius, ttball.color);
 }
@@ -121,7 +131,6 @@ function game(){
 //1 = going top
 //2 = going straight
 
-var directionofBall = 2;
 
 function moveBall(){  
     //left and right sides of the ractangle won't bounce back the ball
@@ -186,9 +195,9 @@ function moveBall(){
         ttball.y += ttball.vy;
     }
 }
-function resetBall(){
+function resetBall(){   
     if(ttball.x < 15){
-        if(ttcomp.score <4)
+        if(ttcomp.score < 20)
             ttcomp.score +=1;
         else{
             alert("Computer Wins!!!!!");
@@ -196,7 +205,7 @@ function resetBall(){
         }
     }
     else{        
-        if(ttuser.score <4)
+        if(ttuser.score < 20)
             ttuser.score +=1;
         else{
             alert("Player Wins!!!!!");
@@ -207,22 +216,13 @@ function resetBall(){
     ttball.x = canvas.width/2;
     ttball.y = canvas.height/2;
 }
-//  ttball's y is in between ( paddle'y & paddle's y + 100)
-// ttball's x paddle's width 
-//bounce back
-
-/*player.top = player.y;
-   player.right = player.x + player.width;
-   player.bottom = player.y + player.height;
-   player.left = player.x;*/
-
 function restartGame(){
     location.reload();
 }
 
 function pauseGame(){
+    clearInterval(loop);
     execution = false;
-    console.log("Setting execution to: " + execution);
 }
 function ttcompAutomation(){
 
@@ -234,33 +234,128 @@ function ttcompAutomation(){
     }
 }
 function startGame(){
-
-    let loop = setInterval(game,1000/framePerSecond);
-
+    if(!execution){
+        loop = setInterval(game,1000/framePerSecond);
+        execution = true;
+    }
 }
 
-function fullScreen(){
-    fullScreenFlag = true;
-   // canvas.width = window.innerWidth - (window.innerWidth *(3/100));
-   // canvas.height = window.innerHeight - (window.innerHeight* (3/100));
-    let elem = document.getElementById("ttgame");
+var buttons = document.getElementById("buttonList");
 
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { /* Safari */
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE11 */
-        elem.msRequestFullscreen();
+/*
+function fullScreen(){
+    
+    var elem = document.getElementById("gameCanvas");
+
+    var changeScreenIcon = document.getElementById("changeScreenIcon");
+
+   
+
+    console.log("flag" + fullScreenFlag);
+    
+    if(fullScreenFlag){
+
+        changeScreenIcon.classList.remove("fa-compress");
+        changeScreenIcon.classList.add("fa-expand");
+
+        console.log("inside fullscreenglag true:" + document.exitFullscreen);
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+            fullScreenFlag = false;
+            changeScreenToMinimize();
+            return true;
+        } else if (document.webkitExitFullscreen) {  
+            document.webkitExitFullscreen();
+            fullScreenFlag = false;
+            changeScreenToMinimize();
+            return true;
+        } else if (document.msExitFullscreen) { 
+            document.msExitFullscreen();
+            fullScreenFlag = false;
+            changeScreenToMinimize();
+            return true;
+        }
     }
     
+
+    if(!fullScreenFlag){
+        
+        changeScreenIcon.classList.remove("fa-expand");
+        changeScreenIcon.classList.add("fa-compress");
+
+        console.log("inside fullscreenglag false:" + elem.requestFullscreen);
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+            fullScreenFlag = true;
+        } else if (elem.webkitRequestFullscreen) { //safari
+            elem.webkitRequestFullscreen();
+            fullScreenFlag = true;
+        } else if (elem.msRequestFullscreen) { // ie11
+            elem.msRequestFullscreen();
+            fullScreenFlag = true;
+        }
+    
+        canvas.width = screen.width -3;
+        canvas.height = screen.height -3;
+
+        changeButtonForFullScreen();
+
+        resetValues(); 
+
+    }
+
     render();
 }
 
-document.getElementById("ttgame").addEventListener('mousemove', e =>{
+function changeButtonForFullScreen(){
+    
+    buttons.style.display = "none";
+
+    buttons.style.margin = "0px";
+    buttons.style.bottom = "10%";
+    buttons.style.left = "42%";
+}
+
+function changeButtonForMinimize(){
+    buttons.style.display = "block";
+    buttons.style.margin = "0px";
+    buttons.style.marginTop = "10px";
+    buttons.style.left = "32%";
+    buttons.style.bottom = "0";
+}
+
+function changeScreenToMinimize(){
+    
+    console.log("inside changescreentominimize func");  
+    canvas.width = 600;
+    canvas.height = 350;
+
+    changeButtonForMinimize();
+    resetValues();
+    render();
+
+}
+
+function resetValues(){
+    ttuser.y =  (canvas.height-100)/2;
+    ttcomp.x = canvas.width - 10 ;
+    ttcomp.y = (canvas.height - 100)/2;
+
+    ttball.x = canvas.width/2;
+    ttball.y = canvas.height/2;
+}
+
+document.getElementById("gameCanvas").addEventListener('mousemove', e =>{
+
     if(fullScreenFlag){
-        document.getElementById("buttonList").style.zIndex = "1000";
+        console.log("mosue is moving");
+
+        buttons.style.display = "block";
     }
 })
-var execution = true;
-var fullScreenFlag = false;
+
+if(fullScreenFlag){
+    buttons.style.display = "none";
+}
+*/
 render();

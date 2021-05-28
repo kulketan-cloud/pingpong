@@ -3,50 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" integrity="sha512-RXf+QSDCUQs5uwRKaDoXt55jygZZm2V++WUZduaU/Ui/9EGp3f/2KZVahFZBKGH0s774sd3HmrhUy+SgOFQLVQ==" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Table Tannis Game</title>
     <style>
         body{
             position: relative;
-            background-color: white;
-            border: 1px solid black;
+            background: url('img/white.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
         }
         .buttonList{
+            position: relative;
             margin-top: 10px;
-            margin-left: 32%;
+            margin-left: 37%;
         }
-
+        
         button{
-            background-color: white;
             border: none;
         }
         .container{
+            position: relative;
             width: 600px;
             height: 450px;
             margin: auto;
             margin-top: 100px;
         }
         #ttgame{
-            border: 2px solid black;
+            position: relative;
+            box-shadow: 0px 10px 20px 10px rgba(0,0,0,0.35), 0 6px 6px rgba(0,0,0,0.23);
+        }
+        #startGame, #pauseGame, #restartGame, #fullScreen
+        {
+            cursor:pointer;
         }
     </style>
 </head>
 <body>
    <div class="container" id="container">
-        <div class="gameCanvas">
+        <div class="gameCanvas" id="gameCanvas">
             <canvas id="ttgame" width="600px" height="350px"></canvas>
-        </div>
-        <div class="buttonList" id="buttonList">
-            <button id="startGame" name="startGame" onclick="startGame()"><i class="fas fa-play-circle fa-3x"></i></button>
-            
-            <button id="pauseGame" name="pauseGame" onclick="pauseGame()"><i class="fas fa-stop-circle fa-3x"></i></button>
 
-            <button id="restartGame" name="restartGame" onclick="restartGame()"><i class="fas fa-undo-alt fa-3x"></i></button>
-
-            <button id="fullScreen" name="fullScreen" onclick="fullScreen()"><i class="fas fa-expand fa-3x"></i></button>
+            <div class="buttonList" id="buttonList">
+                <span id="startGame" name="startGame" onclick="startGame()"><i class="fas fa-play-circle fa-3x"></i></span>
+                
+                <span id="pauseGame" name="pauseGame" onclick="pauseGame()"><i class="fas fa-stop-circle fa-3x"></i></span>
+    
+                <span id="restartGame" name="restartGame" onclick="restartGame()"><i class="fas fa-undo-alt fa-3x"></i></span>
+    
+                <!-- span id="fullScreen" name="fullScreen" onclick="fullScreen()"><i id="changeScreenIcon" class="fas fa-expand fa-3x"></i></span> !-->
+            </div>
         </div>
+
 
     </div>
    <script src="script.js"></script>

@@ -21,7 +21,7 @@ var ttuser = {
     y : (canvas.height-100)/2, 
     
     vx: 0,
-    vy: 50,
+    vy: 30,
 
     width : 10,
     height : 100,
@@ -65,7 +65,7 @@ function drawBall(x, y, r, color){
 
 document.onkeydown = function keyControlsUser(ev){
     if(execution){
-        if(ev.key=="ArrowUp" || ev.key=="W"){
+        if(ev.key=="ArrowUp" || ev.key=="w"){
         
         if(ttuser.y < ttuser.vy) {
             ttuser.y = 0;
@@ -78,7 +78,7 @@ document.onkeydown = function keyControlsUser(ev){
         }
 
         }
-        if(ev.key=="ArrowDown" || ev.key=="S"){
+        if(ev.key=="ArrowDown" || ev.key=="s"){
 
 
             if(ttuser.y > canvas.height-(100 + ttuser.vy)){
@@ -100,7 +100,7 @@ document.onkeydown = function keyControlsUser(ev){
 
 function drawNet(){
     for(let i = 0; i <= canvas.height; i+=15){
-        drawRect((canvas.width-2)/2, ttnet.y + i, ttnet.width, ttnet.height, ttnet.color);
+        drawRect(ttnet.x, ttnet.y + i, ttnet.width, ttnet.height, ttnet.color);
     }
 }
 function drawScore(text,x,y){
@@ -147,7 +147,7 @@ function moveBall(){
       if (ttball.y >= ttuser.y && ttball.y <= (ttuser.y + 100)){
           
           //ball hitting the paddle
-          if(ttball.x == 15){
+          if(ttball.x == 20){
             audio.play();
             ttball.vx = -ttball.vx;
             var centerofUserPaddle = ttuser.y + (ttuser.height/2);
@@ -155,33 +155,48 @@ function moveBall(){
             console.log("ttuser.y:" + ttuser.y);
             console.log("ttball.y:" + ttball.y);
             console.log("centerofuserpaddle:" + centerofUserPaddle);
-            if( ttball.y < centerofUserPaddle + 10 && ttball.y > centerofUserPaddle - 10){
+            if( ttball.y < centerofUserPaddle + 5 && ttball.y > centerofUserPaddle - 5) //check for user paddle between 45 to 55
+            {
                 //do nothing   
                 console.log("touching middle");
                 directionofBall = 2;
             }
-            else{
+            else if(ttball.y < centerofUserPaddle - 5 && ttball.y >= (ttuser.y-ttball.radius)) //check for user paddle between -10 to 44
+            {
                 directionofBall = 1;
                 console.log("touching top");
+            }
+            else if(ttball.y > centerofUserPaddle + 5 && ttball.y <= (ttuser.y+ttuser.height+ttball.radius)) //check for user paddle between 56 to 110
+            {
+                directionofBall = 1;
+                console.log("touching bottom");
             }
           }
       }
       if (ttball.y >= ttcomp.y && ttball.y <= (ttcomp.y + 100)){
           
         //ball hitting the comp paddle
-        if(ttball.x == canvas.width - 15){
+        if(ttball.x == canvas.width - 20){
             audio.play();
             console.log("bounce back from computer paddle");
             ttball.vx = -ttball.vx;
 
             var centerofUserPaddle = ttcomp.y + (ttcomp.height/2);
 
-            if( ttball.y < centerofUserPaddle + 10 && ttball.y > centerofUserPaddle - 10){
+            if( ttball.y < centerofUserPaddle + 5 && ttball.y > centerofUserPaddle - 5) //check for comp paddle between 45 to 55
+            {
                 //do nothing   
                 console.log("touching middle");
                 directionofBall = 2;
             }
-            else{
+            else if(ttball.y < centerofUserPaddle - 5 && ttball.y >= ttcomp.y) //check for comp paddle between 0 to 44
+            {
+                directionofBall = 1;
+                console.log("touching top");
+            }
+            else if(ttball.y > centerofUserPaddle + 5 && ttball.y <= (ttuser.y+ttuser.height)) //check for comp paddle between 56 to 100
+            {
+                console.log("touching bottom");
                 directionofBall = 1;
             }
         }
@@ -190,10 +205,12 @@ function moveBall(){
     if(directionofBall == 2)
       ttball.x += ttball.vx;
 
-    if(directionofBall == 1){
+    if(directionofBall == 1)
+    {
         ttball.x += ttball.vx;
         ttball.y += ttball.vy;
     }
+
 }
 function resetBall(){   
     if(ttball.x < 15){
@@ -226,12 +243,7 @@ function pauseGame(){
 }
 function ttcompAutomation(){
 
-    if(ttball.y > ttcomp.y + ttcomp.height - ttball.radius){
-        ttcomp.y += ttcomp.vy;
-    }
-    if(ttball.y < ttcomp.y){
-        ttcomp.y -= ttcomp.vy;
-    }
+    ttcomp.y += (ttball.y - (ttcomp.y + ttcomp.height/2))*0.085;
 }
 function startGame(){
     if(!execution){
@@ -246,18 +258,13 @@ var buttons = document.getElementById("buttonList");
 function fullScreen(){
     
     var elem = document.getElementById("gameCanvas");
-
     var changeScreenIcon = document.getElementById("changeScreenIcon");
-
    
-
     console.log("flag" + fullScreenFlag);
     
     if(fullScreenFlag){
-
         changeScreenIcon.classList.remove("fa-compress");
         changeScreenIcon.classList.add("fa-expand");
-
         console.log("inside fullscreenglag true:" + document.exitFullscreen);
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -277,12 +284,10 @@ function fullScreen(){
         }
     }
     
-
     if(!fullScreenFlag){
         
         changeScreenIcon.classList.remove("fa-expand");
         changeScreenIcon.classList.add("fa-compress");
-
         console.log("inside fullscreenglag false:" + elem.requestFullscreen);
         if (elem.requestFullscreen) {
             elem.requestFullscreen();
@@ -297,25 +302,18 @@ function fullScreen(){
     
         canvas.width = screen.width -3;
         canvas.height = screen.height -3;
-
         changeButtonForFullScreen();
-
         resetValues(); 
-
     }
-
     render();
 }
-
 function changeButtonForFullScreen(){
     
     buttons.style.display = "none";
-
     buttons.style.margin = "0px";
     buttons.style.bottom = "10%";
     buttons.style.left = "42%";
 }
-
 function changeButtonForMinimize(){
     buttons.style.display = "block";
     buttons.style.margin = "0px";
@@ -323,37 +321,28 @@ function changeButtonForMinimize(){
     buttons.style.left = "32%";
     buttons.style.bottom = "0";
 }
-
 function changeScreenToMinimize(){
     
     console.log("inside changescreentominimize func");  
     canvas.width = 600;
     canvas.height = 350;
-
     changeButtonForMinimize();
     resetValues();
     render();
-
 }
-
 function resetValues(){
     ttuser.y =  (canvas.height-100)/2;
     ttcomp.x = canvas.width - 10 ;
     ttcomp.y = (canvas.height - 100)/2;
-
     ttball.x = canvas.width/2;
     ttball.y = canvas.height/2;
 }
-
 document.getElementById("gameCanvas").addEventListener('mousemove', e =>{
-
     if(fullScreenFlag){
         console.log("mosue is moving");
-
         buttons.style.display = "block";
     }
 })
-
 if(fullScreenFlag){
     buttons.style.display = "none";
 }
